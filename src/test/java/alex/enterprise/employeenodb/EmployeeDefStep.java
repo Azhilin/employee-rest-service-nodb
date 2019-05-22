@@ -1,6 +1,7 @@
 package alex.enterprise.employeenodb;
 
 import alex.enterprise.employeenodb.model.Employee;
+import cucumber.api.java.After;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -39,5 +40,12 @@ public class EmployeeDefStep extends SpringIntegrationTest {
     @Then("retrieved data is equal to added data")
     public void retrievedDataIsEqualToAddedData() {
         Assertions.assertThat(actual).isEqualTo(expected);
+    }
+
+    @After
+    public void cleanUp() {
+        expected.clear();
+        actual.clear();
+        restTemplate.delete("http://localhost:9090/employee");
     }
 }
