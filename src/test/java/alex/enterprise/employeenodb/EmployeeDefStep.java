@@ -16,9 +16,6 @@ public class EmployeeDefStep extends SpringIntegrationTest {
     private List<Employee> expected;
     private List<Employee> actual;
 
-//    @LocalServerPort
-//    private int port;
-
     @Given("employees added to Employee rest service repository:")
     public void addListOfEmployees(List<Employee> employees) {
         restTemplate.put("http://localhost:9090/employee/list", employees);
