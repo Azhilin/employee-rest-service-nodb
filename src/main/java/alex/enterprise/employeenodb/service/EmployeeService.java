@@ -20,9 +20,7 @@ public class EmployeeService {
     }
 
     public Employee getById(Integer id) {
-        if (isNull(id)) {
-            throw new CustomRuntimeException("id cannot be null");
-        }
+        checkKey(id);
         return employeeMap.getOrDefault(id, null);
     }
 
@@ -30,13 +28,44 @@ public class EmployeeService {
         if (isNull(employee)) {
             throw new CustomRuntimeException("Employee cannot be null");
         } else if (employeeMap.containsKey(employee.getId())) {
-            throw new CustomRuntimeException(String.format("Employee with such id = %s already exists", employee.getId()));
+            throw new CustomRuntimeException(String
+                    .format("Employee with such id = %s already exists", employee.getId()));
         } else {
             employeeMap.put(employee.getId(), employee);
         }
     }
 
-//    public void addList(List<Employee> employees) {
-//        employees.forEach(employee -> employeeDao.save(employee));
-//    }
+    public void addList(List<Employee> employees) {
+        if (employees.isEmpty()) {
+            throw new CustomRuntimeException("No employees to add!");
+        }
+
+        employees.forEach(employee -> {
+            if (employeeMap.containsKey(employee.getId())) {
+                throw new CustomRuntimeException(String
+                        .format("Employee with such id = %s already exists", employee.getId()));
+            } else {
+                employeeMap.put(employee.getId(), employee);
+            }
+
+        });
+    }
+
+    public void deleteById(Integer id) {
+        checkKey(id);
+        employeeMap.remove(id);
+    }
+
+    public void clear() {
+        employeeMap.clear();
+    }
+
+    private void checkKey(Integer id) {
+        if (isNull(id)) {
+            throw new CustomRuntimeException("id cannot be null");
+        } else if (!employeeMap.containsKey(id)) {
+            throw new CustomRuntimeException(String
+                    .format("Employee with such id = %s not found", id));
+        }
+    }
 }
