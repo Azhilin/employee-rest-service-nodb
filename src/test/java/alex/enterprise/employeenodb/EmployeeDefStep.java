@@ -1,5 +1,6 @@
 package alex.enterprise.employeenodb;
 
+import alex.enterprise.employeenodb.exception.CustomRuntimeException;
 import alex.enterprise.employeenodb.model.Employee;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
@@ -20,15 +21,35 @@ import java.util.stream.Collectors;
 @Slf4j
 public class EmployeeDefStep extends SpringIntegrationTest {
 
-    private List<Employee> expected;
-    private List<Employee> actual;
+    private List<Employee> expectedList;
+    private List<Employee> actualList;
+    private Employee expected;
+    private Employee actual;
 
     private String baseUrl = "http://localhost:";
+
+    @Before
+    public void doSetup() {
+        long threadId = Thread.currentThread().getId();
+        String processName = ManagementFactory.getRuntimeMXBean().getName();
+        log.info(String.format("Started in thread: %s, in JVM: %s", threadId, processName));
+    }
+
+    @After
+    public void cleanUp() {
+        if (Objects.nonNull(expectedList)) {
+            expectedList.clear();
+        } else if (Objects.nonNull(actualList)) {
+            actualList.clear();
+        }
+
+        restTemplate.delete(String.format("%s%s/employee", baseUrl, port));
+    }
 
     @Given("employees added to Employee rest service repository:")
     public void addListOfEmployees(List<Employee> employees) {
         restTemplate.put(String.format("%s%s/employee/list", baseUrl, port), employees);
-        expected = employees.stream().sorted().collect(Collectors.toList());
+        expectedList = employees.stream().sorted().collect(Collectors.toList());
     }
 
 
@@ -42,25 +63,31 @@ public class EmployeeDefStep extends SpringIntegrationTest {
                 }
         );
 
-        actual = Objects.requireNonNull(responseEntity.getBody()).stream().sorted().collect(Collectors.toList());
+        actualList = Objects.requireNonNull(responseEntity.getBody()).stream().sorted().collect(Collectors.toList());
     }
 
     @Then("retrieved data is equal to added data")
     public void retrievedDataIsEqualToAddedData() {
+        Assertions.assertThat(actualList).isEqualTo(expectedList);
+    }
+
+    @When("we send {string} request to the {string} endpoint with {int} id")
+    public void weSendGETRequestToTheEmployeeEndpointWithId(String methodName, String endpoint, int id) {
+        ResponseEntity<Employee> responseEntity = restTemplate.exchange(
+                String.format("%s%s/%s/%s", baseUrl, port, endpoint, id),
+                HttpMethod.resolve(methodName),
+                null,
+                Employee.class
+        );
+
+        actual = Objects.requireNonNull(responseEntity.getBody());
+
+        expected = expectedList.stream().filter(employee -> employee.getId() == id).findFirst()
+                .orElseThrow(() -> new CustomRuntimeException(String.format("Expected employee not found with id = %s", id)));
+    }
+
+    @Then("retrieved data is equal to added data for specified id")
+    public void retrievedDataIsEqualToAddedDataForSpecifiedId() {
         Assertions.assertThat(actual).isEqualTo(expected);
-    }
-
-    @Before
-    public void doSetup() {
-        long threadId = Thread.currentThread().getId();
-        String processName = ManagementFactory.getRuntimeMXBean().getName();
-        log.info(String.format("Started in thread: %s, in JVM: %s", threadId, processName));
-    }
-
-    @After
-    public void cleanUp() {
-        expected.clear();
-        actual.clear();
-        restTemplate.delete(String.format("%s%s/employee", baseUrl, port));
     }
 }

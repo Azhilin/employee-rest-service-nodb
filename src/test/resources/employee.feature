@@ -19,3 +19,12 @@ Feature: Employee rest service test feature
       | 114 | Max  | MX159753       | School     |
     When we send 'GET' request to the '/employee' endpoint
     Then retrieved data is equal to added data
+
+  Scenario: Add and get one employee by id
+    Given employees added to Employee rest service repository:
+      | id  | name | passportNumber | education  |
+      | 108 | Tom  | TM123456       | University |
+      | 109 | Sam  | SM456789       | College    |
+      | 110 | John | JN789123       | School     |
+    When we send 'GET' request to the '/employee' endpoint with 108 id
+    Then retrieved data is equal to added data for specified id
