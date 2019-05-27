@@ -1,3 +1,4 @@
+@employee
 Feature: Employee rest service test feature 1
   This feature contains BDD scenarios for Employee rest service
 
