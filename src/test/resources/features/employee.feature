@@ -20,7 +20,7 @@ Feature: Employee rest service test feature
     When we send 'GET' request to the '/employee' endpoint
     Then retrieved data is equal to added data
 
-  Scenario: Add and get one employee by id
+  Scenario:Get one employee by id
     Given employees added to Employee rest service repository:
       | id  | name | passportNumber | education  |
       | 108 | Tom  | TM123456       | University |

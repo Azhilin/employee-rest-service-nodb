@@ -1,4 +1,4 @@
-package alex.enterprise.employeenodb;
+package alex.enterprise.employeenodb.employee;
 
 import alex.enterprise.employeenodb.model.Employee;
 import cucumber.api.TypeRegistry;
