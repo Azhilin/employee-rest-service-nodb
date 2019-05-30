@@ -56,11 +56,10 @@ public class EmployeeController {
         return "All employees have been successfully deleted!";
     }
 
-    private Employee enrichWithPermission(Employee e) {
+    private void enrichWithPermission(Employee e) {
         String permissionUrl = auxiliaryService.addId(e.getId());
         Boolean permissionFlag = auxiliaryService.getByUrl(permissionUrl);
 
         e.setPermission(Permission.of(permissionUrl, permissionFlag));
-        return e;
     }
 }
