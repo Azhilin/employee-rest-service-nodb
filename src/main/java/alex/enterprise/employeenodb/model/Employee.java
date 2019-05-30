@@ -1,17 +1,17 @@
 package alex.enterprise.employeenodb.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class Employee implements Comparable<Employee> {
-    private Integer id;
-    private String name;
-    private String passportNumber;
-    private String education;
+    @NonNull private Integer id;
+    @NonNull private String name;
+    @NonNull private String passportNumber;
+    @NonNull private String education;
+    private Permission permission;
 
     @Override
     public int compareTo(Employee employee) {
