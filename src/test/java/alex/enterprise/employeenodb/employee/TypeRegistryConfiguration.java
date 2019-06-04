@@ -20,15 +20,14 @@ public class TypeRegistryConfiguration implements TypeRegistryConfigurer {
     public void configureTypeRegistry(TypeRegistry typeRegistry) {
 
         typeRegistry.defineDataTableType(new DataTableType(
-                        Employee.class,
-                        (Map<String, String> row) -> new Employee(
-                                Integer.valueOf(row.get("id")),
-                                row.get("name"),
-                                row.get("passportNumber"),
-                                row.get("education")
-                        )
+                Employee.class,
+                (Map<String, String> row) -> new Employee(
+                        Integer.valueOf(row.get("id")),
+                        row.get("name"),
+                        row.get("passportNumber"),
+                        row.get("education")
                 )
-        );
+        ));
     }
 
 }

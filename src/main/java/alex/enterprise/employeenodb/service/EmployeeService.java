@@ -21,7 +21,7 @@ public class EmployeeService {
 
     public Employee getById(Integer id) {
         checkKey(id);
-        return employeeMap.get(id);
+        return employeeMap.getOrDefault(id, null);
     }
 
     public void add(Employee employee) {
