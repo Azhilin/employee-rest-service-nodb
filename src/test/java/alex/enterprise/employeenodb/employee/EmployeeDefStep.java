@@ -51,6 +51,7 @@ public class EmployeeDefStep extends SpringIntegrationTest {
 
     @Given("employees added to Employee rest service repository:")
     public void addListOfEmployees(List<Employee> employees) {
+
         restTemplate.put(String.format("%s/employee/list", baseUrl), employees);
         expectedList = employees.stream().sorted().collect(Collectors.toList());
     }
