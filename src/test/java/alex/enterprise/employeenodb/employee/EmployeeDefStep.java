@@ -18,14 +18,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static alex.enterprise.employeenodb.util.session.SessionKey.ACTUAL_RESULT;
-import static alex.enterprise.employeenodb.util.session.SessionKey.EXPECTED_RESULT;
+import static alex.enterprise.employeenodb.util.session.SessionKey.*;
 
 @Slf4j
 public class EmployeeDefStep extends SpringIntegrationTest {
-
-    private List<Employee> expectedList;
-    private List<Employee> actualList;
 
     @Before
     public void doSetup() {
@@ -38,11 +34,6 @@ public class EmployeeDefStep extends SpringIntegrationTest {
 
     @After
     public void cleanUp() {
-        if (Objects.nonNull(expectedList)) {
-            expectedList.clear();
-        } else if (Objects.nonNull(actualList)) {
-            actualList.clear();
-        }
 
         restTemplate.delete(String.format("%s/employee", baseUrl));
         getSoftAssertions().assertAll();
@@ -53,7 +44,8 @@ public class EmployeeDefStep extends SpringIntegrationTest {
     public void addListOfEmployees(List<Employee> employees) {
 
         restTemplate.put(String.format("%s/employee/list", baseUrl), employees);
-        expectedList = employees.stream().sorted().collect(Collectors.toList());
+        List<Employee> expectedList = employees.stream().sorted().collect(Collectors.toList());
+        session.put(EXPECTED_LIST, expectedList);
     }
 
 
@@ -67,12 +59,15 @@ public class EmployeeDefStep extends SpringIntegrationTest {
                 }
         );
 
-        actualList = Objects.requireNonNull(responseEntity.getBody()).stream().sorted().collect(Collectors.toList());
+        List<Employee> actualList = Objects.requireNonNull(responseEntity.getBody()).stream().sorted().collect(Collectors.toList());
+        session.put(ACTUAL_LIST, actualList);
     }
 
     @Then("retrieved data is equal to added data")
     public void retrievedDataIsEqualToAddedData() {
-        getSoftAssertions().assertThat(actualList).isEqualTo(expectedList);
+        getSoftAssertions()
+                .assertThat(session.get(ACTUAL_LIST, Object.class))
+                .isEqualTo(session.get(EXPECTED_LIST, Object.class));
     }
 
     @When("we send {string} request to the {string} endpoint with {int} id")
@@ -87,6 +82,8 @@ public class EmployeeDefStep extends SpringIntegrationTest {
         Employee actual = Objects.requireNonNull(responseEntity.getBody());
 
         session.put(ACTUAL_RESULT, actual);
+
+        List<Employee> expectedList = (List<Employee>) session.get(EXPECTED_LIST, Object.class);
 
         Employee expected = expectedList.stream().filter(employee -> employee.getId() == id).findFirst()
                 .orElseThrow(() -> new CustomRuntimeException(String.format("Expected employee not found with id = %s", id)));
