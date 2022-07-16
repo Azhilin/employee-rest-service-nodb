@@ -51,6 +51,28 @@ public class EmployeeService {
         });
     }
 
+    public void update(Employee employee) {
+        if (isNull(employee)) {
+            throw new CustomRuntimeException("Employee cannot be null");
+        } else if (!employeeMap.containsKey(employee.getId())) {
+            throw new CustomRuntimeException(String
+                    .format("Employee with such id = %s doesn't exist", employee.getId()));
+        } else {
+            employeeMap.put(employee.getId(), employee);
+        }
+    }
+
+    public void updatePatch(Employee employee) {
+        if (isNull(employee)) {
+            throw new CustomRuntimeException("Employee cannot be null");
+        } else if (!employeeMap.containsKey(employee.getId())) {
+            throw new CustomRuntimeException(String
+                    .format("Employee with such id = %s doesn't exist", employee.getId()));
+        } else {
+            employeeMap.put(employee.getId(), employee);
+        }
+    }
+
     public void deleteById(Integer id) {
         checkKey(id);
         employeeMap.remove(id);
